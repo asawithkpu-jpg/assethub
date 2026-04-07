@@ -33,6 +33,8 @@ Route::middleware(['auth'])->group(function () {
         // Rute kustom harus berada di atas Resource agar tidak dianggap sebagai ID oleh rute resource
         Route::delete('/peminjaman-internal/{id}', [PeminjamanInternalController::class, 'destroy'])->name('peminjaman-internal.destroy');
         Route::post('peminjaman-internal/upload-foto/{detailId}', [PeminjamanInternalController::class, 'uploadFotoBarang'])->name('peminjaman-internal.upload-foto');
+        Route::post('/peminjaman-internal/{id}/approve-pimpinan', [PeminjamanInternalController::class, 'approvePimpinan'])->name('peminjaman-internal.approvePimpinan');
+        // Route::post('/peminjaman-internal/{id}/reject-pimpinan', [PeminjamanInternalController::class, 'rejectPimpinan'])->name('peminjaman-internal.rejectPimpinan');
         Route::post('peminjaman-internal/{id}/approve', [PeminjamanInternalController::class, 'approve'])->name('peminjaman-internal.approve');
         Route::post('peminjaman-internal/{id}/reject', [PeminjamanInternalController::class, 'reject'])->name('peminjaman-internal.reject');
         Route::post('peminjaman-internal/{id}/cancel', [PeminjamanInternalController::class, 'cancel'])->name('peminjaman-internal.cancel');
@@ -46,6 +48,9 @@ Route::middleware(['auth'])->group(function () {
         // export pdf dan word
         Route::get('/peminjaman-internal/{id}/pdf', [PeminjamanInternalController::class, 'exportPdf'])->name('peminjaman-internal.pdf');
         Route::get('/peminjaman-internal/{id}/word', [PeminjamanInternalController::class, 'exportWord'])->name('peminjaman-internal.word');
+        // file form peminjaman
+        Route::post('/peminjaman-internal/{id}/upload-form-pinjam', [PeminjamanInternalController::class, 'uploadFormPinjam'])->name('peminjaman-internal.upload-form-pinjam');
+        Route::delete('/peminjaman-internal/{id}/delete-form-pinjam', [PeminjamanInternalController::class, 'deleteFormPinjam'])->name('peminjaman-internal.delete-form-pinjam');
         // Resource otomatis mencakup index, create, store, show, edit, update, destroy
         Route::resource('peminjaman-internal', PeminjamanInternalController::class);
     });
@@ -70,6 +75,9 @@ Route::middleware(['auth'])->group(function () {
         // excport PDF & Word
         Route::get('/eksternal-peminjaman/{id}/export-pdf', [PeminjamanEksternalController::class, 'exportPdf'])->name('eksternal-peminjaman.export-pdf');
         Route::get('/eksternal-peminjaman/{id}/export-word', [PeminjamanEksternalController::class, 'exportWord'])->name('eksternal-peminjaman.export-word');
+        // file form peminjaman
+        Route::post('/peminjaman-eksternal/{id}/upload-form-pinjam', [PeminjamanEksternalController::class, 'uploadFormPinjam'])->name('peminjaman-eksternal.upload-form-pinjam');
+        Route::delete('/peminjaman-eksternal/{id}/delete-form-pinjam', [PeminjamanEksternalController::class, 'deleteFormPinjam'])->name('peminjaman-eksternal.delete-form-pinjam');
         Route::resource('peminjaman-eksternal', PeminjamanEksternalController::class);
     });
 

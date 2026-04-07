@@ -89,6 +89,7 @@
                                                 <span class="text-[10px] font-bold text-green-600" title="Baik">{{ $detail->kembali_baik ?? 0 }}</span>
                                                 <span class="text-[10px] font-bold text-orange-500" title="Rusak Ringan">{{ $detail->kembali_rusak_ringan ?? 0 }}</span>
                                                 <span class="text-[10px] font-bold text-red-500" title="Rusak Berat">{{ $detail->kembali_rusak_berat ?? 0 }}</span>
+                                                <span class="text-[10px] font-bold text-gray-500" title="Hilang">{{ $detail->kembali_hilang ?? 0 }}</span>
                                             </div>
                                         </div>
                                     </div>

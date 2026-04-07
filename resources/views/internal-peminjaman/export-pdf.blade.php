@@ -134,7 +134,7 @@
     <table class="signature-table">
         <tr>
             <td width="50%"></td>
-            <td>Pasuruan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</td>
+            <td>Pasuruan, {{ \Carbon\Carbon::parse($peminjaman->tgl_kembali_real ?? $peminjaman->tgl_pinjam)->translatedFormat('d F Y') }}</td>
         </tr>
         <tr>
             <td>Peminjam,</td>

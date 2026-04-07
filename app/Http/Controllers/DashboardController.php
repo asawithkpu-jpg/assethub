@@ -32,6 +32,7 @@ class DashboardController extends Controller
         $qtyChart = collect();
         $unitStats = collect();
         $approvalItems = collect();
+        $returnSchedules = collect();
 
         if ($isStaff) {
             // Card Stats Staff
@@ -50,6 +51,22 @@ class DashboardController extends Controller
                 'sedang_dipinjam' => Peminjaman::where('status', 'Dipinjam')->count(),
                 'total_selesai' => Peminjaman::where('status', 'Selesai')->whereBetween('tgl_pinjam', [$startDate, $endDate])->count(),
             ];
+
+            // alert untuk jadwal pengembalian hari ini dan besok
+            if ($user->can('proses-peminjaman') || $user->can('persetujuan-kasubbag')) {
+                $today = Carbon::today();
+                $tomorrow = Carbon::tomorrow();
+                
+                $returnSchedules = Peminjaman::with(['user', 'details.asset'])
+                    ->where('status', 'Dipinjam')
+                    ->whereDate('tgl_kembali', '<=', $today) // Hari ini atau sudah lewat (terlambat)
+                    ->orWhere(function($q) use ($tomorrow) {
+                        $q->where('status', 'Dipinjam')
+                        ->whereDate('tgl_kembali', $tomorrow); // H+1 dari hari ini (atau H-1 dari sisi tgl_kembali)
+                    })
+                    ->orderBy('tgl_kembali', 'asc')
+                    ->get();
+            }
 
             // Chart Bar: Frekuensi per Unit (Subbag/Instansi)
             $unitStats = Peminjaman::whereBetween('tgl_pinjam', [$startDate, $endDate])
@@ -135,7 +152,7 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'stats', 'qtyChart', 'unitStats', 'latestPeminjaman', 
             'approvalItems', 'isStaff', 'startDate', 'endDate',
-            'unitQtyChart', 'userQtyChart'
+            'unitQtyChart', 'userQtyChart', 'returnSchedules'
         ));
     }
 }

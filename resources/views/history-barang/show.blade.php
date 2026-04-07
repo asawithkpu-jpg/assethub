@@ -49,6 +49,7 @@
                         <th class="px-4 py-4 font-bold text-center text-green-600">Kembali Baik</th>
                         <th class="px-4 py-4 font-bold text-center text-orange-500">Kembali R. Ringan</th>
                         <th class="px-4 py-4 font-bold text-center text-red-500">Kembali R. Berat</th>
+                        <th class="px-4 py-4 font-bold text-center text-gray-500">Kembali Hilang</th>
                         <th class="px-4 py-4 font-bold text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -94,6 +95,9 @@
                         </td>
                         <td class="px-4 py-4 text-center border-y dark:border-gray-700">
                             <span class="text-[11px] text-red-500">{{ $log->kembali_rusak_berat ?? 0 }}</span>
+                        </td>
+                        <td class="px-4 py-4 text-center border-y dark:border-gray-700">
+                            <span class="text-[11px] text-gray-500">{{ $log->kembali_hilang ?? 0 }}</span>
                         </td>
                         <td class="px-4 py-4 text-center border-y first:border-l last:border-r dark:border-gray-700 first:rounded-l-lg last:rounded-r-lg">
                             @php

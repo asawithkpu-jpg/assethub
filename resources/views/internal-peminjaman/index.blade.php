@@ -60,7 +60,7 @@
                     </td>
                     <td class="px-3 py-3 text-center">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-tighter uppercase
-                            {{ $item->status == 'Menunggu acc Kasubbag' ? 'bg-orange-100 text-orange-600' : ($item->status == 'Ditolak' ? 'bg-red-100 text-red-600' : ($item->status == 'Batal' ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-600')) }}">
+                            {{ $item->status == 'Menunggu acc Kasubbag' || $item->status == 'Menunggu acc Pimpinan' ? 'bg-orange-100 text-orange-600' : ($item->status == 'Ditolak' ? 'bg-red-100 text-red-600' : ($item->status == 'Batal' ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-600')) }}">
                             {{ str_replace('_', ' ', $item->status) }}
                         </span>
                     </td>

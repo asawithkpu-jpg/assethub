@@ -244,7 +244,7 @@ class PeminjamanEksternalController extends Controller
                 $input = $request->items[$detail->id];
                 
                 // Validasi jumlah total pengembalian harus sama dengan jumlah pinjam (qty)
-                $totalKembali = $input['baik'] + $input['rusak_ringan'] + $input['rusak_berat'];
+                $totalKembali = $input['baik'] + $input['rusak_ringan'] + $input['rusak_berat'] + $input['hilang'];
                 if ($totalKembali != $detail->qty) {
                     throw new \Exception("Total pengembalian untuk {$detail->asset->nama_asset} tidak sesuai dengan jumlah pinjam.");
                 }
@@ -254,7 +254,7 @@ class PeminjamanEksternalController extends Controller
                     'kembali_baik' => $input['baik'],
                     'kembali_rusak_ringan' => $input['rusak_ringan'],
                     'kembali_rusak_berat' => $input['rusak_berat'],
-                    // Hapus tgl_kembali_real dari sini karena kolomnya tidak ada di tabel detail
+                    'kembali_hilang' => $input['hilang'],
                 ]);
 
                 // 3. Update Stok di tb_assets
@@ -266,6 +266,7 @@ class PeminjamanEksternalController extends Controller
                 // Tambahkan ke akumulasi rusak jika ada
                 $asset->increment('rusak_ringan', $input['rusak_ringan']);
                 $asset->increment('rusak_berat', $input['rusak_berat']);
+                $asset->increment('hilang', $input['hilang']);
             }
 
             // 4. Update status dan tanggal kembali riil di tabel utama
@@ -433,5 +434,44 @@ class PeminjamanEksternalController extends Controller
 
         // Mengarahkan ke view export-word
         return response()->view('eksternal-peminjaman.export-word', compact('peminjaman', 'setting', 'logoBase64', 'filler'), 200, $headers);
+    }
+
+    public function uploadFormPinjam(Request $request, $id)
+    {
+        $request->validate([
+            'file_form_pinjam' => 'required|mimes:pdf|max:2048',
+        ]);
+
+        $peminjaman = Peminjaman::with('user')->findOrFail($id);
+
+        // Format Nama: tglpinjam_instansi_nosurat.pdf
+        $tgl = Carbon::parse($peminjaman->tgl_pinjam)->format('Ymd');
+        $instansi = str_replace(['/', '\\'], '-', $peminjaman->user->instansi);
+        $noSurat = str_replace(['/', '\\'], '-', $peminjaman->kode_peminjaman);
+
+        $fileName = "{$tgl}_{$instansi}_{$noSurat}.pdf";
+        $path = 'eksternal/dokumen';
+
+        if ($peminjaman->file_form_pinjam) {
+            Storage::disk('public')->delete($path . '/' . $peminjaman->file_form_pinjam);
+        }
+
+        $request->file('file_form_pinjam')->storeAs($path, $fileName, 'public');
+
+        $peminjaman->update(['file_form_pinjam' => $fileName]);
+
+        return back()->with('success', 'Dokumen berhasil diunggah.');
+    }
+
+    public function deleteFormPinjam($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        if ($peminjaman->file_form_pinjam) {
+            Storage::disk('public')->delete('eksternal/dokumen/' . $peminjaman->file_form_pinjam);
+            $peminjaman->update(['file_form_pinjam' => null]);
+        }
+
+        return back()->with('success', 'Dokumen berhasil dihapus.');
     }
 }

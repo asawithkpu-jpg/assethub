@@ -78,6 +78,7 @@
                         <th class="px-4 py-2.5 text-center border-b dark:border-gray-700 w-20">baik</th>
                         <th class="px-4 py-2.5 text-center border-b dark:border-gray-700 w-20">r. ringan</th>
                         <th class="px-4 py-2.5 text-center border-b dark:border-gray-700 w-20">r. berat</th>
+                        <th class="px-4 py-2.5 text-center border-b dark:border-gray-700 w-20">hilang</th>
                         <th class="px-4 py-2.5 text-center border-b dark:border-gray-700">foto keluar</th>
                         <th class="px-4 py-2.5 text-center border-b dark:border-gray-700">foto kembali</th>
                     </tr>
@@ -96,6 +97,9 @@
                         </td>
                         <td class="px-2 py-3">
                             <input type="number" form="formKembali" name="items[{{ $detail->id }}][rusak_berat]" value="0" min="0" max="{{ $detail->qty }}" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded px-1 py-1 text-center text-[10px] focus:ring-1 focus:ring-red-400" required>
+                        </td>
+                        <td class="px-2 py-3">
+                            <input type="number" form="formKembali" name="items[{{ $detail->id }}][hilang]" value="0" min="0" max="{{ $detail->qty }}" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded px-1 py-1 text-center text-[10px] focus:ring-1 focus:ring-gray-400" required>
                         </td>
 
                         <td class="px-4 py-3 text-center">

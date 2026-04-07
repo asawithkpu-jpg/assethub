@@ -193,6 +193,44 @@
                         <strong class="uppercase tracking-tighter mr-1">alasan penolakan:</strong> <span class="italic font-medium lowercase">{{ $peminjaman->catatan_penolakan ?? '-' }}</span>
                     </div>
                 @endif
+
+                <div class="mt-4 mb-8 border-t border-dashed dark:border-gray-800 pt-6">
+                    <h3 class="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3">Dokumen Scan</h3>
+                    
+                    @if($peminjaman->file_form_pinjam)
+                        <div class="flex items-center gap-2">
+                            <button type="button" 
+                                onclick="openPreviewModal('{{ asset('storage/' . ($peminjaman->tipe_peminjaman == 'internal' ? 'internal/dokumen/' : 'eksternal/dokumen/') . $peminjaman->file_form_pinjam) }}')" 
+                                class="flex items-center gap-1.5 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 px-2.5 py-1.5 rounded-md border border-blue-100 dark:border-blue-800 hover:bg-blue-100 transition shadow-sm text-[9px] font-bold uppercase tracking-tight">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                Preview
+                            </button>
+    
+                            <form action="{{ route($peminjaman->tipe_peminjaman == 'internal' ? 'peminjaman-internal.upload-form-pinjam' : 'peminjaman-eksternal.upload-form-pinjam', $peminjaman->id) }}" method="POST" enctype="multipart/form-data" class="relative">
+                                @csrf
+                                <input type="file" name="file_form_pinjam" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="this.form.submit()">
+                                <button type="button" class="bg-gray-50 dark:bg-gray-800 text-gray-500 border dark:border-gray-700 px-2.5 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-tight hover:bg-gray-100 transition">
+                                    Ganti
+                                </button>
+                            </form>
+    
+                            <button type="button" onclick="confirmDeleteDoc()" 
+                                class="text-gray-400 hover:text-red-500 p-1.5 transition-colors" title="Hapus Dokumen">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                    @else
+                        <form action="{{ route($peminjaman->tipe_peminjaman == 'internal' ? 'peminjaman-internal.upload-form-pinjam' : 'peminjaman-eksternal.upload-form-pinjam', $peminjaman->id) }}" method="POST" enctype="multipart/form-data" class="max-w-xs">
+                            @csrf
+                            <div class="flex items-center gap-2">
+                                <input type="file" name="file_form_pinjam" accept="application/pdf" required
+                                    class="block w-full text-[9px] text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-[9px] file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition cursor-pointer">
+                                <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-tighter shadow-sm hover:bg-indigo-700">Unggah</button>
+                            </div>
+                            <p class="text-[8px] text-gray-400 mt-1.5 font-medium italic">* PDF, Maks 2MB</p>
+                        </form>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -209,6 +247,25 @@
                 </div>
                 <div class="p-2 bg-gray-200 dark:bg-gray-900 aspect-[3/4] w-full relative">
                     <embed src="{{ asset('storage/eksternal/surat/'.$peminjaman->file_surat) }}#toolbar=0" type="application/pdf" width="100%" height="100%" class="rounded shadow-inner">
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal Preview PDF --}}
+        <div id="pdfModal" class="fixed inset-0 z- hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="closePreviewModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-middle bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                    <div class="flex justify-between items-center p-4 border-b dark:border-gray-800">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-tight">Preview Dokumen</h3>
+                        <button onclick="closePreviewModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div class="h-[70vh]">
+                        <iframe id="pdfFrame" src="" class="w-full h-full" frameborder="0"></iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -330,5 +387,53 @@
             }
         });
     @endif
+
+    // file form pinjam
+    function openPreviewModal(url) {
+        document.getElementById('pdfFrame').src = url;
+        document.getElementById('pdfModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // prevent scroll
+    }
+
+    function closePreviewModal() {
+        document.getElementById('pdfModal').classList.add('hidden');
+        document.getElementById('pdfFrame').src = '';
+        document.body.style.overflow = 'auto';
+    }
+
+    function confirmDeleteDoc() {
+        Swal.fire({
+            title: 'HAPUS DOKUMEN?',
+            text: "File PDF akan dihapus permanen dari server.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'YA, HAPUS',
+            cancelButtonText: 'BATAL',
+            width: '320px',
+            customClass: {
+                popup: 'rounded-lg border dark:border-gray-700 shadow-2xl',
+                title: 'text-sm font-bold pt-4',
+                htmlContainer: 'text-[15px]',
+                confirmButton: 'text-[10px] px-3 py-1.5 uppercase tracking-wider font-bold',
+                cancelButton: 'text-[10px] px-3 py-1.5 uppercase tracking-wider font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Buat form dinamis untuk mengirimkan request DELETE
+                let form = document.createElement('form');
+                form.method = 'POST';
+                // Tentukan route berdasarkan tipe (bisa dikirim lewat parameter atau logic blade)
+                form.action = "{{ route($peminjaman->tipe_peminjaman == 'internal' ? 'peminjaman-internal.delete-form-pinjam' : 'peminjaman-eksternal.delete-form-pinjam', $peminjaman->id) }}";
+                
+                form.innerHTML = `
+                    @csrf
+                    @method('DELETE')
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
 </script>
 @endsection

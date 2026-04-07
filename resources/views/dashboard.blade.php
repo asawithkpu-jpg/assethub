@@ -75,6 +75,77 @@
         </div>
     </div>
 
+    {{-- Tabel Jadwal Pengembalian (H-1 & Hari H) --}}
+    @canany(['proses-peminjaman', 'persetujuan-kasubbag'])
+        @if($returnSchedules->count() > 0)
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border-2 border-blue-100 dark:border-blue-900/30 overflow-hidden mb-6">
+            <div class="p-4 bg-blue-50/50 dark:bg-blue-900/10 border-b dark:border-slate-700 flex justify-between items-center">
+                <h3 class="font-bold text-sm text-blue-800 dark:text-blue-400 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Jadwal Pengembalian Barang
+                </h3>
+                <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">Penting</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 font-semibold uppercase text-[10px]">
+                        <tr>
+                            <th class="p-4">Peminjam</th>
+                            <th class="p-4">Barang</th>
+                            <th class="p-4 text-center">Tgl Kembali</th>
+                            <th class="p-4 text-center">Status Waktu</th>
+                            <th class="p-4 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y dark:divide-slate-700">
+                        @foreach($returnSchedules as $rs)
+                        @php
+                            $tglKembali = \Carbon\Carbon::parse($rs->tgl_kembali);
+                            $isToday = $tglKembali->isToday();
+                            $isPast = $tglKembali->isPast() && !$isToday;
+                            $isTomorrow = $tglKembali->isTomorrow();
+                        @endphp
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                            <td class="p-4">
+                                <div class="font-bold text-slate-700 dark:text-slate-200">{{ $rs->user->name }}</div>
+                                <div class="text-[10px] text-slate-400">{{ $rs->tipe_peminjaman == 'internal' ? $rs->user->subbagian : $rs->user->instansi }}</div>
+                            </td>
+                            <td class="p-4">
+                                @foreach($rs->details as $det)
+                                    <div class="flex items-center gap-1">
+                                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                        {{ $det->asset->nama_asset }} ({{ $det->qty }})
+                                    </div>
+                                @endforeach
+                            </td>
+                            <td class="p-4 text-center font-medium">
+                                {{ $tglKembali->format('d M Y') }}
+                            </td>
+                            <td class="p-4 text-center">
+                                @if($isPast)
+                                    <span class="px-2 py-1 rounded bg-red-100 text-red-700 text-[9px] font-bold uppercase tracking-wider animate-pulse">Terlambat</span>
+                                @elseif($isToday)
+                                    <span class="px-2 py-1 rounded bg-orange-100 text-orange-700 text-[9px] font-bold uppercase tracking-wider">Hari Ini</span>
+                                @elseif($isTomorrow)
+                                    <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 text-[9px] font-bold uppercase tracking-wider">H-1 (Besok)</span>
+                                @endif
+                            </td>
+                            <td class="p-4 text-center">
+                                @if($rs->tipe_peminjaman == 'internal')
+                                    <a href="{{ route('peminjaman-internal.show', $rs->id) }}" class="bg-slate-800 dark:bg-slate-100 dark:text-slate-800 text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase hover:opacity-80 transition-all">Detail</a>
+                                @else
+                                    <a href="{{ route('peminjaman-eksternal.show', $rs->id) }}" class="bg-slate-800 dark:bg-slate-100 dark:text-slate-800 text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase hover:opacity-80 transition-all">Detail</a>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+    @endcanany
+
     {{-- Approval Table --}}
     @if($approvalItems->count() > 0)
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border-2 border-orange-100 dark:border-orange-900/30 overflow-hidden">
@@ -107,7 +178,12 @@
                             <span class="px-2 py-1 rounded bg-yellow-100 text-yellow-700 text-[9px] font-bold uppercase">{{ $item->status }}</span>
                         </td>
                         <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:underline font-bold">Detail / Proses</a>
+                            <a href="{{ $item->tipe_peminjaman == 'internal' 
+                                        ? route('peminjaman-internal.show', $item->id) 
+                                        : route('peminjaman-eksternal.show', $item->id) }}" 
+                            class="bg-slate-800 dark:bg-slate-100 dark:text-slate-800 text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase hover:opacity-80 transition-all">
+                                Proses
+                            </a>
                         </td>
                     </tr>
                     @endforeach

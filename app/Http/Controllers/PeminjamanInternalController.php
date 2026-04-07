@@ -72,7 +72,8 @@ class PeminjamanInternalController extends Controller
                 'nama_kegiatan'   => $request->nama_kegiatan,
                 'tgl_pinjam'      => $request->tgl_pinjam,
                 'tgl_kembali'     => $request->tgl_kembali,
-                'status'          => 'Menunggu acc Kasubbag', 
+                // 'status'          => 'Menunggu acc Kasubbag', 
+                'status'          => 'Menunggu acc Pimpinan', 
                 'created_by'      => Auth::id(),
             ]);
 
@@ -122,6 +123,22 @@ class PeminjamanInternalController extends Controller
                 'message' => 'Gagal menyimpan data: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function approvePimpinan($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        
+        // Pastikan hanya bisa disetujui jika statusnya memang menunggu pimpinan
+        if ($peminjaman->status !== 'Menunggu acc Pimpinan') {
+            return redirect()->back()->with('error', 'Status peminjaman tidak valid.');
+        }
+
+        $peminjaman->update([
+            'status' => 'Menunggu acc Kasubbag'
+        ]);
+
+        return redirect()->route('peminjaman-internal.index')->with('success', 'Disetujui Pimpinan, Menunggu acc Kasubbag');
     }
 
     public function updateStatus(Request $request, $id, $newStatus)
@@ -303,7 +320,7 @@ class PeminjamanInternalController extends Controller
                 $input = $request->items[$detail->id];
                 
                 // Validasi jumlah
-                $totalKembali = $input['baik'] + $input['rusak_ringan'] + $input['rusak_berat'];
+                $totalKembali = $input['baik'] + $input['rusak_ringan'] + $input['rusak_berat'] + $input['hilang'];
                 if ($totalKembali != $detail->qty) {
                     throw new \Exception("Total untuk {$detail->asset->nama_asset} tidak sesuai.");
                 }
@@ -313,6 +330,7 @@ class PeminjamanInternalController extends Controller
                     'kembali_baik' => $input['baik'],
                     'kembali_rusak_ringan' => $input['rusak_ringan'],
                     'kembali_rusak_berat' => $input['rusak_berat'],
+                    'kembali_hilang' => $input['hilang'],
                 ]);
 
                 // 3. Update Stok di tb_assets
@@ -321,6 +339,7 @@ class PeminjamanInternalController extends Controller
                 $asset->increment('stok_tersedia', $input['baik']);
                 $asset->increment('rusak_ringan', $input['rusak_ringan']);
                 $asset->increment('rusak_berat', $input['rusak_berat']);
+                $asset->increment('hilang', $input['hilang']);
             }
 
             // 4. Update status DAN tanggal kembali riil
@@ -483,5 +502,44 @@ class PeminjamanInternalController extends Controller
         header("Expires: 0");
 
         return view('internal-peminjaman.export-word', compact('peminjaman', 'setting', 'filler', 'logoBase64'));
+    }
+
+    public function uploadFormPinjam(Request $request, $id)
+    {
+        $request->validate([
+            'file_form_pinjam' => 'required|mimes:pdf|max:2048',
+        ]);
+
+        $peminjaman = Peminjaman::with('user')->findOrFail($id);
+
+        // Format Nama: tglpinjam_subbagian_kodepeminjaman.pdf
+        $tgl = Carbon::parse($peminjaman->tgl_pinjam)->format('Ymd');
+        $subbagian = str_replace(['/', '\\'], '-', $peminjaman->user->subbagian);
+        $kode = str_replace(['/', '\\'], '-', $peminjaman->kode_peminjaman);
+        
+        $fileName = "{$tgl}_{$subbagian}_{$kode}.pdf";
+        $path = 'internal/dokumen';
+
+        // Hapus file lama jika ada
+        if ($peminjaman->file_form_pinjam) {
+            Storage::disk('public')->delete($path . '/' . $peminjaman->file_form_pinjam);
+        }
+
+        $request->file('file_form_pinjam')->storeAs($path, $fileName, 'public');
+
+        $peminjaman->update(['file_form_pinjam' => $fileName]);
+
+        return back()->with('success', 'Dokumen berhasil diunggah.');
+    }
+
+    // Tambahkan route delete jika belum ada, atau gabungkan di logic update
+    public function deleteFormPinjam($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        if ($peminjaman->file_form_pinjam) {
+            Storage::disk('public')->delete('internal/dokumen/' . $peminjaman->file_form_pinjam);
+            $peminjaman->update(['file_form_pinjam' => null]);
+        }
+        return back()->with('success', 'Dokumen berhasil dihapus.');
     }
 }
