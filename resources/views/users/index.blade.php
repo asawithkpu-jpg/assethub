@@ -34,7 +34,7 @@
                         <th class="px-3 py-2.5 w-[30%] text-gray-500">PEGAWAI / IDENTITAS</th>
                         <th class="px-3 py-2.5 text-gray-500">JABATAN / SUBBAGIAN / INSTANSI</th>
                         <th class="px-3 py-2.5 text-gray-500">ROLE</th>
-                        <th class="px-3 py-2.5 text-center w-20 text-gray-500">AKSI</th>
+                        <th class="px-3 py-2.5 text-center w-20 text-gray-500">#</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y dark:divide-gray-700">

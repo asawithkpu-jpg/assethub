@@ -50,7 +50,7 @@
                         <th class="px-4 py-4 font-bold text-center text-orange-500">Kembali R. Ringan</th>
                         <th class="px-4 py-4 font-bold text-center text-red-500">Kembali R. Berat</th>
                         <th class="px-4 py-4 font-bold text-center text-gray-500">Kembali Hilang</th>
-                        <th class="px-4 py-4 font-bold text-center">Aksi</th>
+                        <th class="px-4 py-4 font-bold text-center">#</th>
                     </tr>
                 </thead>
                 <tbody>

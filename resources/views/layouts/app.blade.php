@@ -69,6 +69,19 @@
 <body class="bg-[#f4f7fa] dark:bg-darkBg text-[#2f3944] dark:text-gray-200 font-sans text-sm">
 
     <div class="flex h-screen overflow-hidden">
+        <div 
+            x-show="sidebarOpen" 
+            x-transition:enter="transition ease-in-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in-out duration-300"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="sidebarOpen = false" 
+            class="fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm md:hidden"
+            x-cloak>
+        </div>
+
         <aside 
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-darkCard border-r dark:border-gray-700 transition-transform duration-300 md:relative md:translate-x-0">
@@ -154,6 +167,14 @@
                 </a>
                 @endcan
                 @endcanany
+
+                <a href="{{ route('manual.book') }}" target="_blank" 
+                class="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('manual.book') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 border-r-4 border-primary' : 'text-gray-600 dark:text-gray-400' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <span class="font-medium">Manual Book</span>
+                </a>
             </nav>
         </aside>
 
@@ -255,8 +276,8 @@
                 <footer class="h-12 bg-white dark:bg-darkCard border-t dark:border-gray-700 flex items-center justify-between px-6 md:px-8 text-[11px] text-gray-500 shrink-0">
                     <div>2026 &copy; <span class="font-bold text-primary italic">AssetHub</span> - KPU Kabupaten Pasuruan</div>
                     <div class="hidden sm:block uppercase font-bold text-[10px] space-x-4 tracking-wider">
-                        <a href="https://wa.me/6285156431103?text=Hai%20admin%2C%20saya%20butuh%20bantuan%20terkait%20AssetHub." target="_blank" class="hover:text-primary transition">Support</a>
-                        <a href="#" class="hover:text-primary transition">Documentation</a>
+                        <a href="#" target="_blank" class="hover:text-primary transition">Feedback</a>
+                        <a href="{{ route('manual.book') }}" target="_blank" class="hover:text-primary transition">Documentation</a>
                     </div>
                 </footer>
             </main>

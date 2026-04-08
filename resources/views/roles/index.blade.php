@@ -34,7 +34,7 @@
                         <tr>
                             <th class="px-3 py-2.5 w-[20%]">role</th>
                             <th class="px-3 py-2.5">akses (permissions)</th>
-                            <th class="px-3 py-2.5 text-center w-20">aksi</th>
+                            <th class="px-3 py-2.5 text-center w-20">#</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y dark:divide-gray-700">

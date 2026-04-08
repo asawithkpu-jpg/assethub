@@ -55,7 +55,7 @@
                         <th class="px-3 py-2.5 text-center">Tersedia</th>
                         <th class="px-3 py-2.5 text-center">R. Ringan</th>
                         <th class="px-3 py-2.5 text-center">R. Berat</th>
-                        <th class="px-3 py-2.5 text-center">Status</th> <th class="px-3 py-2.5 text-center w-20">Aksi</th>
+                        <th class="px-3 py-2.5 text-center">Status</th> <th class="px-3 py-2.5 text-center w-20">#</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y dark:divide-gray-700">
@@ -63,15 +63,22 @@
                     <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition text-[11px]">
                         <td class="px-3 py-2.5">
                             <div class="flex items-center space-x-3">
-                                <div class="w-9 h-9 rounded bg-gray-100 dark:bg-gray-700 flex-shrink-0 border dark:border-gray-600 overflow-hidden shadow-inner">
+                                <div class="w-9 h-9 rounded bg-gray-100 dark:bg-gray-700 flex-shrink-0 border dark:border-gray-600 overflow-hidden shadow-inner cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
+                                    @if($asset->foto) 
+                                        @click="$dispatch('preview-image', '{{ asset('storage/'.$asset->foto) }}')" 
+                                    @endif>
+                                    
                                     @if($asset->foto)
-                                        <img src="{{ asset('storage/'.$asset->foto) }}" class="object-cover w-full h-full">
+                                        <img src="{{ asset('storage/'.$asset->foto) }}" class="object-cover w-full h-full group-hover:scale-110 transition-transform">
                                     @else
                                         <div class="flex items-center justify-center h-full text-gray-400">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2"></path></svg>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2"></path>
+                                            </svg>
                                         </div>
                                     @endif
                                 </div>
+
                                 <div>
                                     <p class="font-bold text-gray-700 dark:text-gray-100 uppercase leading-tight">{{ $asset->nama_asset }}</p>
                                     <p class="text-[9px] font-mono font-bold text-primary mt-0.5 tracking-tighter">{{ $asset->kode_asset }}</p>
@@ -105,6 +112,25 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <div x-data="{ open: false, src: '' }" 
+        @preview-image.window="open = true; src = $event.detail"
+        x-show="open" 
+        x-cloak
+        class="fixed inset-0 z- flex items-center justify-center p-4">
+        
+        <div x-show="open" x-transition.opacity @click="open = false" 
+            class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+        <div x-show="open" x-transition.scale.95 @click="open = false" 
+            class="relative max-w-full max-h-full cursor-zoom-out">
+            <img :src="src" class="rounded shadow-2xl max-h-[90vh] mx-auto border-2 border-white dark:border-gray-700">
+            
+            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity">
+                Klik di mana saja untuk menutup
+            </div>
         </div>
     </div>
 

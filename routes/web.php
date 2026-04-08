@@ -18,6 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/my-profile', [UserController::class, 'profileEdit'])->name('profile.edit');
     Route::put('/my-profile/update', [UserController::class, 'profileUpdate'])->name('profile.update');
+    Route::get('/manual-book', [DashboardController::class, 'manualBook'])->name('manual.book');
 
     // MASTER ASSET
     Route::middleware('permission:master-asset')->group(function () {

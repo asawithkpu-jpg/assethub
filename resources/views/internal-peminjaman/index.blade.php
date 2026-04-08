@@ -36,7 +36,7 @@
                     <th class="px-3 py-3 font-bold text-center">Tgl Kembali</th>
                     <th class="px-3 py-3 font-bold">Barang & Qty</th>
                     <th class="px-3 py-3 font-bold text-center">Status</th>
-                    <th class="px-3 py-3 font-bold text-center">Aksi</th>
+                    <th class="px-3 py-3 font-bold text-center">#</th>
                 </tr>
             </thead>
             <tbody class="text-[11px]">

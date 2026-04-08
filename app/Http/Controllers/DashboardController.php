@@ -155,4 +155,9 @@ class DashboardController extends Controller
             'unitQtyChart', 'userQtyChart', 'returnSchedules'
         ));
     }
+
+    public function manualBook()
+    {
+        return view('manual-book'); 
+    }
 }

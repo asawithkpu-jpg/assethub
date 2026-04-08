@@ -38,7 +38,7 @@
                         <th class="px-4 py-4 font-bold text-left">Peminjaman</th>
                         <th class="px-4 py-4 font-bold text-center">Rentang Pinjam</th>
                         <th class="px-4 py-4 font-bold text-left">Barang / Asset (Qty)</th>
-                        <th class="px-4 py-4 font-bold text-center">Aksi</th>
+                        <th class="px-4 py-4 font-bold text-center">#</th>
                     </tr>
                 </thead>
                 <tbody>
