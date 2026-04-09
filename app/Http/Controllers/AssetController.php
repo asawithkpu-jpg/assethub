@@ -60,23 +60,25 @@ class AssetController extends Controller
             'rusak_berat'   => 'required|numeric',
             'lokasi'        => 'required',
             'status'        => 'required|in:aktif,nonaktif',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            // 'foto'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'foto'          => 'nullable|image|max:2048'
         ]);
 
-        $data = $request->all();
+        // Ambil semua data input kecuali foto dulu
+        $data = $request->except('foto');
 
         if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
+            // Hapus foto lama dari storage
             if ($asset->foto) {
                 Storage::disk('public')->delete($asset->foto);
             }
 
             $file = $request->file('foto');
-            
-            // Penamaan file kustom saat update
             $namaFileCustom = $request->kode_asset . '-' . Str::slug($request->nama_asset) . '.' . $file->getClientOriginalExtension();
             
-            $data['foto'] = $file->storeAs('barang', $namaFileCustom, 'public');
+            // Simpan file baru
+            $path = $file->storeAs('barang', $namaFileCustom, 'public');
+            $data['foto'] = $path;
         }
 
         $asset->update($data);

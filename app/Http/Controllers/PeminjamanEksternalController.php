@@ -21,13 +21,17 @@ class PeminjamanEksternalController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        
+        // Inisialisasi query dasar
         $query = Peminjaman::with(['user', 'details.asset'])
             ->where('tipe_peminjaman', 'eksternal')
             ->latest();
-
-        // Spatie & Ownership Filter
-        if (!auth()->user()->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator'])) {
-            $query->where('user_id', auth()->id());
+            
+        if (!$user->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator'])) {
+            $query->whereHas('user', function($q) use ($user) {
+                $q->where('instansi', $user->instansi);
+            });
         }
 
         $peminjamans = $query->get();
@@ -117,7 +121,23 @@ class PeminjamanEksternalController extends Controller
 
     public function show($id)
     {
+        // Ambil data peminjaman beserta detail aset dan data user (owner)
         $peminjaman = Peminjaman::with(['user', 'details.asset'])->findOrFail($id);
+        
+        $currentUser = auth()->user();
+        $owner = $peminjaman->user; // User yang membuat pengajuan
+        
+        $hasSpecialRole = $currentUser->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator']);
+        $isOwner = $peminjaman->user_id === $currentUser->id;
+        
+        // Pastikan kolom 'instansi' ada di tabel users
+        $isSameInstansi = ($owner && $currentUser->instansi === $owner->instansi);
+
+        if (!$hasSpecialRole && !$isOwner && !$isSameInstansi) {
+            // Berikan error 403 Forbidden jika tidak memenuhi kriteria
+            abort(403, 'Anda tidak memiliki izin untuk melihat data dari instansi lain.');
+        }
+
         return view('eksternal-peminjaman.show', compact('peminjaman'));
     }
 

@@ -145,6 +145,9 @@
             <div x-show="openModal" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-middle bg-white dark:bg-darkCard rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md w-full border dark:border-gray-700">
                 <form :action="editMode ? '/assets/' + currentAsset.id : '{{ route('assets.store') }}'" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <!-- <template x-if="editMode">
+                        @method('PUT')
+                    </template> -->
                     <div class="px-4 py-3 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                         <span class="text-[10px] font-bold text-gray-600 dark:text-white uppercase tracking-widest" x-text="editMode ? 'Update Data Asset' : 'Input Asset Baru'"></span>
                         <button type="button" @click="openModal = false" class="text-gray-400 hover:text-gray-600 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"></path></svg></button>
@@ -200,6 +203,11 @@
                                 </select>
                             </div>
 
+                            @if ($errors->any())
+                            <div class="text-red-500 text-[10px] mb-2 shadow-sm p-2 bg-red-50 rounded">
+                                Gagal simpan: {{ $errors->first() }}
+                            </div>
+                            @endif
                             <div>
                                 <label class="block mb-1">Foto Asset</label>
                                 <input type="file" name="foto" class="block w-full text-[9px] text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-50 file:text-primary file:font-bold hover:file:bg-blue-100 transition file:cursor-pointer cursor-pointer">

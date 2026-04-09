@@ -24,13 +24,16 @@ class PeminjamanInternalController extends Controller
 {
     public function index()
     {
-        // Inisialisasi query dengan relasi yang dibutuhkan
+        $user = auth()->user();
+        
         $query = Peminjaman::with(['user', 'details.asset'])
             ->where('tipe_peminjaman', 'internal')
             ->latest();
 
-        if (!auth()->user()->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator'])) {
-            $query->where('user_id', auth()->id());
+        if (!$user->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator'])) {
+            $query->whereHas('user', function($q) use ($user) {
+                $q->where('subbagian', $user->subbagian);
+            });
         }
 
         $peminjamans = $query->get();
@@ -185,18 +188,18 @@ class PeminjamanInternalController extends Controller
 
     public function show($id)
     {
-        // Ambil data peminjaman beserta detail asetnya
         $peminjaman = Peminjaman::with(['user', 'details.asset'])->findOrFail($id);
+        
+        $currentUser = auth()->user();
+        $owner = $peminjaman->user; 
 
-        /**
-         * Proteksi Akses:
-         * Izinkan akses HANYA JIKA:
-         * 1. User adalah pemilik data tersebut ($peminjaman->user_id == auth()->id())
-         * 2. ATAU User memiliki role admin/kasubag/pimpinan
-         */
-        if ($peminjaman->user_id !== auth()->id() && !auth()->user()->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator'])) {
-            // Berikan error 403 Forbidden jika tidak berhak
-            abort(403, 'Anda tidak memiliki izin untuk melihat halaman ini.');
+        $hasSpecialRole = $currentUser->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator']);
+        $isOwner = $peminjaman->user_id === $currentUser->id;
+        
+        $isSameSubbag = ($owner && $currentUser->subbagian === $owner->subbagian);
+
+        if (!$hasSpecialRole && !$isOwner && !$isSameSubbag) {
+            abort(403, 'Anda tidak memiliki izin untuk melihat data dari subbagian lain.');
         }
 
         return view('internal-peminjaman.show', compact('peminjaman'));

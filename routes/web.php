@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
         Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
         Route::post('/assets/{id}', [AssetController::class, 'update'])->name('assets.update');
+        // Route::put('/assets/{id}', [AssetController::class, 'update'])->name('assets.update');
         Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
         Route::get('/assets/get-next-code/{kategori}', [AssetController::class, 'getNextCode']);
     });
