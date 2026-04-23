@@ -26,7 +26,7 @@ class PeminjamanEksternalController extends Controller
         // Inisialisasi query dasar
         $query = Peminjaman::with(['user', 'details.asset'])
             ->where('tipe_peminjaman', 'eksternal')
-            ->latest();
+            ->orderBy('tgl_pinjam', 'desc');
             
         if (!$user->hasAnyRole(['administrator', 'kasubbag', 'pimpinan', 'operator'])) {
             $query->whereHas('user', function($q) use ($user) {

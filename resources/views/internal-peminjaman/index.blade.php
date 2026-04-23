@@ -106,7 +106,8 @@
                 searchPlaceholder: "Cari data peminjaman...",
                 lengthMenu: "_MENU_",
             },
-            pageLength: 10
+            pageLength: 10,
+            order: [[5, 'desc']]
         });
     });
 
